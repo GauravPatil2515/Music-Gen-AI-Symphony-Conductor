@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symphony Conductor AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0a0a1a 0%,#1a1a3e 40%,#2d1b4e 70%,#0a0a1a 100%);color:#e8e6f0;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:.2;transform:scale(.8)}100%{opacity:1;transform:scale(1.2)}}
+.container{position:relative;z-index:1;width:100%;max-width:680px;margin:20px;padding:40px 36px;background:rgba(20,18,40,.85);border:1px solid rgba(140,120,200,.2);border-radius:24px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 80px rgba(120,80,200,.08),inset 0 1px 0 rgba(255,255,255,.05)}
+h1{text-align:center;font-size:2em;font-weight:700;background:linear-gradient(135deg,#c9a0ff,#7b68ee,#daa0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;letter-spacing:-.5px}
+.icon{text-align:center;font-size:2.8em;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(180,140,255,.4))}
+.sub{text-align:center;color:#9a8ec0;font-size:.88em;margin-bottom:28px;line-height:1.5}
+.input-wrap{position:relative;margin-bottom:16px}
+textarea{width:100%;min-height:110px;padding:16px 18px;background:rgba(30,26,60,.9);border:1.5px solid rgba(140,120,200,.25);border-radius:14px;color:#e8e6f0;font-size:.95em;font-family:inherit;resize:vertical;outline:none;transition:border-color .3s,box-shadow .3s;line-height:1.6}
+textarea:focus{border-color:rgba(140,120,200,.6);box-shadow:0 0 20px rgba(120,80,200,.15)}
+textarea::placeholder{color:#6a5f8a}
+.btn-row{display:flex;gap:10px;margin-bottom:24px}
+button{flex:1;padding:14px 20px;border:none;border-radius:12px;font-size:.95em;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;letter-spacing:.3px}
+.btn-primary{background:linear-gradient(135deg,#7b68ee,#9b59b6);color:#fff;box-shadow:0 4px 20px rgba(120,80,200,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(120,80,200,.4)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:rgba(60,50,100,.5);color:#c0b0e0;border:1px solid rgba(140,120,200,.2)}
+.btn-secondary:hover{background:rgba(80,65,130,.5)}
+.examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;justify-content:center}
+.chip{padding:7px 14px;background:rgba(120,80,200,.12);border:1px solid rgba(140,120,200,.2);border-radius:20px;font-size:.8em;color:#b8a0e0;cursor:pointer;transition:all .2s;white-space:nowrap}
+.chip:hover{background:rgba(120,80,200,.25);border-color:rgba(140,120,200,.4);transform:scale(1.04)}
+.output-box{min-height:80px;padding:20px;background:rgba(25,22,50,.7);border:1px solid rgba(140,120,200,.15);border-radius:14px;white-space:pre-wrap;line-height:1.7;font-size:.92em;transition:all .3s;overflow-y:auto;max-height:400px}
+.output-box.active{border-color:rgba(140,120,200,.35);box-shadow:0 0 30px rgba(120,80,200,.08)}
+.output-label{font-size:.78em;color:#7a6fa0;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-weight:600}
+.loading{display:inline-block;width:18px;height:18px;border:2px solid rgba(140,120,200,.3);border-top-color:#9b7bea;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wave{position:absolute;bottom:-1px;left:0;width:100%;height:60px;pointer-events:none;opacity:.08}
+.footer{text-align:center;margin-top:20px;font-size:.72em;color:#5a5080}
+@media(max-width:500px){.container{margin:10px;padding:24px 20px}h1{font-size:1.5em}.examples{gap:6px}.chip{padding:5px 10px;font-size:.75em}}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="container">
+<div class="icon">🎼</div>
+<h1>Symphony Conductor AI</h1>
+<p class="sub">Analyze pitch, timing & harmony — enter notes, tempo, or describe your performance</p>
+<div class="examples">
+<span class="chip" onclick="setInput('C E G')">C E G</span>
+<span class="chip" onclick="setInput('A C E allegro')">A C E allegro</span>
+<span class="chip" onclick="setInput('violin trumpet 120 bpm')">violin trumpet 120bpm</span>
+<span class="chip" onclick="setInput('D F# A B presto')">D F# A B presto</span>
+<span class="chip" onclick="setInput('the flute section sounds flat and slow')">flute feedback</span>
+</div>
+<div class="input-wrap">
+<textarea id="inp" placeholder="Enter musical notes (C D E F G A B), tempo (allegro, 120 bpm), instruments, or describe a performance..." rows="3"></textarea>
+</div>
+<div class="btn-row">
+<button class="btn-primary" onclick="analyze()">🎯 Analyze</button>
+<button class="btn-secondary" onclick="clearAll()">Clear</button>
+</div>
+<div class="output-label">Conductor Feedback</div>
+<div class="output-box" id="out">🎵 Ready to analyze. Enter notes, tempo, or instruments above.</div>
+<div class="footer">Symphony Conductor AI — Real-time pitch & timing analysis</div>
+<svg class="wave" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,30 Q150,0 300,30 T600,30 T900,30 T1200,30 V60 H0 Z" fill="#7b68ee"/></svg>
+</div>
+<script>
+(function(){var s=document.getElementById('stars');for(var i=0;i<80;i++){var d=document.createElement('div');d.className='star';d.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;width:'+(.5+Math.random()*2)+'px;height:'+(.5+Math.random()*2)+'px;--d:'+(1+Math.random()*3)+'s;animation-delay:'+Math.random()*3+'s';s.appendChild(d)}})();
+function setInput(v){document.getElementById('inp').value=v;document.getElementById('inp').focus()}
+function clearAll(){document.getElementById('inp').value='';document.getElementById('out').textContent='🎵 Ready to analyze. Enter notes, tempo, or instruments above.';document.getElementById('out').classList.remove('active')}
+async function analyze(){
+var inp=document.getElementById('inp'),out=document.getElementById('out'),data=inp.value;
+out.innerHTML='<span class="loading"></span> Analyzing performance...';out.classList.add('active');
+try{var r=await fetch('/solve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:data})});var j=await r.json();out.textContent=j.output}catch(e){out.textContent='⚠️ Connection error. Please try again.'}
+}
+document.getElementById('inp').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();analyze()}});
+</script>
+</body>
+</html>
