@@ -8,13 +8,19 @@ A tool that analyzes an orchestra's live performance and provides real-time feed
 
 ## Features
 
-- Analyzes musical notes (C, D, E, F, G, A, B with sharps/flats)
-- Detects chord quality (major, minor, diminished, augmented)
-- Calculates intervals between notes
-- Recognizes tempo markings (largo, allegro, presto, etc.)
-- Identifies instruments and provides section-specific advice
-- AI-powered analysis when API keys are available
-- Deterministic fallback — always works without external services
+- **Pitch Analysis** — note detection, frequency calculation, intonation cents
+- **Interval Analysis** — identify intervals between notes with consonance/dissonance labels
+- **Chord Recognition** — major, minor, diminished, augmented, 7ths, sus chords
+- **Key Detection** — automatic key/scale identification with confidence percentage
+- **Scale Reference** — major, minor, pentatonic, blues, dorian, mixolydian, phrygian, whole tone, chromatic
+- **Tempo Analysis** — BPM calculation, beat duration, subdivision timing
+- **Dynamics Analysis** — ppp through fff with visual levels, crescendo/diminuendo
+- **Instrumentation** — 25+ instruments with section, range, and voice classification
+- **Orchestra Balance** — section balance tips (brass vs strings, woodwind exposure)
+- **Performance Feedback** — natural language analysis of issues (flat, sharp, rushing, muddy, etc.)
+- **Interactive Piano** — click notes to build sequences
+- **Analysis History** — stored locally, replay previous analyses
+- **AI-Powered** — Groq/OpenRouter/HuggingFace with deterministic fallback
 
 ## Deploy on Render
 
@@ -32,11 +38,11 @@ A tool that analyzes an orchestra's live performance and provides real-time feed
 
 | Variable | Required | Description |
 |---|---|---|
-| `GROQ_API_KEY` | No | Groq API key for LLM analysis |
-| `OPENROUTER_API_KEY` | No | OpenRouter API key |
-| `HUGGINGFACE_API_KEY` | No | HuggingFace Inference API key |
+| `GROQ_API_KEY` | No | Groq API key for LLM-powered analysis |
+| `OPENROUTER_API_KEY` | No | OpenRouter API key (fallback) |
+| `HUGGINGFACE_API_KEY` | No | HuggingFace Inference API key (fallback) |
 
-All keys are optional. The app falls back to built-in deterministic analysis if no keys are set or if API calls fail.
+All keys are optional. The app uses built-in deterministic music analysis if no keys are set or if API calls fail.
 
 ## Run Locally
 
@@ -45,7 +51,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open http://localhost:8000 in your browser.
+Open http://localhost:8000
 
 ## API
 
@@ -53,12 +59,12 @@ Open http://localhost:8000 in your browser.
 
 Request:
 ```json
-{"data": "C E G allegro"}
+{"data": "C E G allegro violin ff"}
 ```
 
 Response:
 ```json
-{"output": "🎼 Notes detected: C, E, G\n📊 Frequencies (Hz): 261.6, 329.6, 392.0\n🎹 Intervals: major 3rd, minor 3rd\n🏆 Chord quality: Major triad — bright and stable\n⏱️ Tempo: Allegro (~140 BPM)"}
+{"output": "━━━ 🎼 PITCH ANALYSIS ━━━\nNotes: C → E → G\n..."}
 ```
 
 ## Tech Stack

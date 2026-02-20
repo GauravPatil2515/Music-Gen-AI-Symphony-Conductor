@@ -6,73 +6,219 @@
 <title>Symphony Conductor AI</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0a0a1a 0%,#1a1a3e 40%,#2d1b4e 70%,#0a0a1a 100%);color:#e8e6f0;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
-.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 20px rgba(139,92,246,.15)}50%{box-shadow:0 0 40px rgba(139,92,246,.3)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes twinkle{0%{opacity:.15;transform:scale(.7)}100%{opacity:1;transform:scale(1.3)}}
+@keyframes noteFloat{0%{opacity:0;transform:translateY(0) rotate(0deg)}20%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translateY(-120px) rotate(20deg)}}
+@keyframes waveMove{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+body{min-height:100vh;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#080818;color:#e2dff0;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(88,28,135,.25),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(30,27,75,.4),transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(91,33,182,.15),transparent 60%),linear-gradient(180deg,#080818 0%,#0f0a2a 40%,#1a0e3a 70%,#080818 100%)}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none}
 .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate}
-@keyframes twinkle{0%{opacity:.2;transform:scale(.8)}100%{opacity:1;transform:scale(1.2)}}
-.container{position:relative;z-index:1;width:100%;max-width:680px;margin:20px;padding:40px 36px;background:rgba(20,18,40,.85);border:1px solid rgba(140,120,200,.2);border-radius:24px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 80px rgba(120,80,200,.08),inset 0 1px 0 rgba(255,255,255,.05)}
-h1{text-align:center;font-size:2em;font-weight:700;background:linear-gradient(135deg,#c9a0ff,#7b68ee,#daa0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;letter-spacing:-.5px}
-.icon{text-align:center;font-size:2.8em;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(180,140,255,.4))}
-.sub{text-align:center;color:#9a8ec0;font-size:.88em;margin-bottom:28px;line-height:1.5}
-.input-wrap{position:relative;margin-bottom:16px}
-textarea{width:100%;min-height:110px;padding:16px 18px;background:rgba(30,26,60,.9);border:1.5px solid rgba(140,120,200,.25);border-radius:14px;color:#e8e6f0;font-size:.95em;font-family:inherit;resize:vertical;outline:none;transition:border-color .3s,box-shadow .3s;line-height:1.6}
-textarea:focus{border-color:rgba(140,120,200,.6);box-shadow:0 0 20px rgba(120,80,200,.15)}
-textarea::placeholder{color:#6a5f8a}
-.btn-row{display:flex;gap:10px;margin-bottom:24px}
-button{flex:1;padding:14px 20px;border:none;border-radius:12px;font-size:.95em;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;letter-spacing:.3px}
-.btn-primary{background:linear-gradient(135deg,#7b68ee,#9b59b6);color:#fff;box-shadow:0 4px 20px rgba(120,80,200,.3)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(120,80,200,.4)}
-.btn-primary:active{transform:translateY(0)}
-.btn-secondary{background:rgba(60,50,100,.5);color:#c0b0e0;border:1px solid rgba(140,120,200,.2)}
-.btn-secondary:hover{background:rgba(80,65,130,.5)}
-.examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;justify-content:center}
-.chip{padding:7px 14px;background:rgba(120,80,200,.12);border:1px solid rgba(140,120,200,.2);border-radius:20px;font-size:.8em;color:#b8a0e0;cursor:pointer;transition:all .2s;white-space:nowrap}
-.chip:hover{background:rgba(120,80,200,.25);border-color:rgba(140,120,200,.4);transform:scale(1.04)}
-.output-box{min-height:80px;padding:20px;background:rgba(25,22,50,.7);border:1px solid rgba(140,120,200,.15);border-radius:14px;white-space:pre-wrap;line-height:1.7;font-size:.92em;transition:all .3s;overflow-y:auto;max-height:400px}
-.output-box.active{border-color:rgba(140,120,200,.35);box-shadow:0 0 30px rgba(120,80,200,.08)}
-.output-label{font-size:.78em;color:#7a6fa0;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-weight:600}
-.loading{display:inline-block;width:18px;height:18px;border:2px solid rgba(140,120,200,.3);border-top-color:#9b7bea;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.wave{position:absolute;bottom:-1px;left:0;width:100%;height:60px;pointer-events:none;opacity:.08}
-.footer{text-align:center;margin-top:20px;font-size:.72em;color:#5a5080}
-@media(max-width:500px){.container{margin:10px;padding:24px 20px}h1{font-size:1.5em}.examples{gap:6px}.chip{padding:5px 10px;font-size:.75em}}
+.notes-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.note-particle{position:absolute;font-size:1.4em;animation:noteFloat 6s ease-in-out infinite;opacity:0}
+.wave-bg{position:fixed;bottom:0;left:0;width:200%;height:120px;z-index:0;pointer-events:none;opacity:.04;animation:waveMove 20s linear infinite}
+.wave-bg svg{width:100%;height:100%}
+.app{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:24px 16px;min-height:100vh;display:flex;flex-direction:column}
+header{text-align:center;padding:32px 0 24px;animation:fadeIn .8s ease-out}
+.logo{font-size:3.2em;margin-bottom:4px;animation:float 4s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 0 20px rgba(167,139,250,.5))}
+h1{font-size:1.9em;font-weight:800;background:linear-gradient(135deg,#c4b5fd,#8b5cf6,#a78bfa,#ddd6fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.5px;line-height:1.2}
+.tagline{color:#8b7fad;font-size:.9em;margin-top:6px;line-height:1.5}
+.card{background:rgba(15,10,42,.75);border:1px solid rgba(139,92,246,.15);border-radius:20px;padding:28px 24px;margin-bottom:16px;backdrop-filter:blur(16px);animation:fadeIn .6s ease-out;transition:border-color .3s}
+.card:hover{border-color:rgba(139,92,246,.3)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-weight:700;font-size:1.05em;color:#c4b5fd}
+.card-header span{font-size:1.3em}
+.examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.chip{padding:8px 16px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:24px;font-size:.82em;color:#a78bfa;cursor:pointer;transition:all .25s;white-space:nowrap;user-select:none}
+.chip:hover{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.4);transform:translateY(-2px);box-shadow:0 4px 12px rgba(139,92,246,.15)}
+.chip:active{transform:translateY(0)}
+.input-group{position:relative}
+textarea{width:100%;min-height:100px;padding:16px 18px;background:rgba(20,15,50,.8);border:1.5px solid rgba(139,92,246,.18);border-radius:14px;color:#e2dff0;font-size:.92em;font-family:inherit;resize:vertical;outline:none;transition:all .3s;line-height:1.6}
+textarea:focus{border-color:rgba(139,92,246,.5);box-shadow:0 0 24px rgba(139,92,246,.12);background:rgba(25,18,55,.9)}
+textarea::placeholder{color:#5a5280}
+.char-count{position:absolute;bottom:10px;right:14px;font-size:.7em;color:#4a4570}
+.btn-row{display:flex;gap:10px;margin-top:14px}
+button{flex:1;padding:13px 20px;border:none;border-radius:12px;font-size:.92em;font-weight:700;font-family:inherit;cursor:pointer;transition:all .25s;letter-spacing:.3px;position:relative;overflow:hidden}
+.btn-analyze{background:linear-gradient(135deg,#7c3aed,#8b5cf6,#a78bfa);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.3)}
+.btn-analyze:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,.4)}
+.btn-analyze:active{transform:translateY(0)}
+.btn-analyze:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-clear{background:rgba(55,48,90,.5);color:#a09cc0;border:1px solid rgba(139,92,246,.15)}
+.btn-clear:hover{background:rgba(75,65,120,.5);border-color:rgba(139,92,246,.3)}
+.btn-history{background:rgba(55,48,90,.5);color:#a09cc0;border:1px solid rgba(139,92,246,.15);flex:.5}
+.btn-history:hover{background:rgba(75,65,120,.5)}
+.output-card{animation:pulseGlow 3s ease-in-out infinite;transition:all .4s}
+.output-card.has-content{animation:none;border-color:rgba(139,92,246,.3)}
+.output-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.output-label span{font-size:.75em;color:#6b6490;text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+.status{display:flex;align-items:center;gap:6px;font-size:.75em}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,.4)}
+.status-dot.loading{background:#fbbf24;animation:pulseGlow 1s infinite}
+.output-box{min-height:100px;padding:20px;background:rgba(10,8,30,.6);border:1px solid rgba(139,92,246,.08);border-radius:12px;white-space:pre-wrap;line-height:1.75;font-size:.88em;max-height:500px;overflow-y:auto;word-break:break-word;transition:all .3s}
+.output-box.fresh{animation:slideUp .4s ease-out}
+.output-box::-webkit-scrollbar{width:6px}
+.output-box::-webkit-scrollbar-track{background:transparent}
+.output-box::-webkit-scrollbar-thumb{background:rgba(139,92,246,.2);border-radius:3px}
+.output-box::-webkit-scrollbar-thumb:hover{background:rgba(139,92,246,.4)}
+.loading-indicator{display:inline-flex;align-items:center;gap:8px;color:#a78bfa}
+.dot-wave{display:flex;gap:4px}
+.dot-wave span{width:6px;height:6px;background:#a78bfa;border-radius:50%;animation:float 1.2s ease-in-out infinite}
+.dot-wave span:nth-child(2){animation-delay:.2s}
+.dot-wave span:nth-child(3){animation-delay:.4s}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
+.feat{padding:14px 16px;background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.1);border-radius:12px;font-size:.82em;display:flex;align-items:flex-start;gap:10px;transition:all .25s;cursor:default}
+.feat:hover{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2);transform:translateY(-2px)}
+.feat-icon{font-size:1.3em;flex-shrink:0}
+.feat-text{color:#9b95c0;line-height:1.4}
+.feat-text strong{color:#c4b5fd;display:block;margin-bottom:2px}
+.history-panel{display:none;margin-top:8px;max-height:250px;overflow-y:auto;padding:12px;background:rgba(10,8,30,.5);border-radius:12px;border:1px solid rgba(139,92,246,.1)}
+.history-panel.open{display:block;animation:slideUp .3s ease-out}
+.history-item{padding:10px 12px;border-bottom:1px solid rgba(139,92,246,.08);cursor:pointer;font-size:.82em;color:#8b7fad;transition:all .2s;border-radius:8px;margin-bottom:4px}
+.history-item:hover{background:rgba(139,92,246,.08);color:#c4b5fd}
+.history-item:last-child{border-bottom:none;margin-bottom:0}
+.history-time{font-size:.72em;color:#5a5280;margin-top:2px}
+.history-empty{text-align:center;color:#5a5280;font-size:.85em;padding:16px}
+footer{text-align:center;padding:24px 0;color:#3d3860;font-size:.72em;margin-top:auto}
+footer a{color:#6d5eaa;text-decoration:none}
+footer a:hover{color:#a78bfa}
+.keyboard{display:flex;justify-content:center;gap:2px;margin:12px 0;flex-wrap:wrap}
+.key{padding:8px 6px;min-width:32px;background:rgba(255,255,255,.06);border:1px solid rgba(139,92,246,.12);border-radius:6px;text-align:center;font-size:.72em;color:#8b7fad;cursor:pointer;transition:all .2s;font-weight:600}
+.key:hover{background:rgba(139,92,246,.15);color:#c4b5fd;transform:translateY(-2px)}
+.key.sharp{background:rgba(20,15,50,.8);color:#6d5eaa;font-size:.65em}
+.mode-tabs{display:flex;gap:6px;margin-bottom:16px}
+.mode-tab{padding:8px 16px;border-radius:20px;font-size:.8em;font-weight:600;cursor:pointer;border:1px solid rgba(139,92,246,.15);color:#7b74a0;background:transparent;transition:all .2s}
+.mode-tab.active{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.3)}
+.mode-tab:hover{border-color:rgba(139,92,246,.3)}
+@media(max-width:600px){.app{padding:12px 10px}header{padding:20px 0 16px}.logo{font-size:2.4em}h1{font-size:1.4em}.card{padding:20px 16px;border-radius:16px}.examples{gap:6px}.chip{padding:6px 12px;font-size:.78em}.features{grid-template-columns:1fr}.key{min-width:26px;padding:6px 4px;font-size:.65em}.btn-row{flex-wrap:wrap}.btn-history{flex:1}}
 </style>
 </head>
 <body>
+<div class="bg"></div>
 <div class="stars" id="stars"></div>
-<div class="container">
-<div class="icon">🎼</div>
+<div class="notes-bg" id="notesBg"></div>
+<div class="wave-bg"><svg viewBox="0 0 2400 120" preserveAspectRatio="none"><path d="M0,60 Q150,20 300,60 T600,60 T900,60 T1200,60 T1500,60 T1800,60 T2100,60 T2400,60 V120 H0 Z" fill="#7c3aed"/></svg></div>
+
+<div class="app">
+<header>
+<div class="logo">🎼</div>
 <h1>Symphony Conductor AI</h1>
-<p class="sub">Analyze pitch, timing & harmony — enter notes, tempo, or describe your performance</p>
-<div class="examples">
-<span class="chip" onclick="setInput('C E G')">C E G</span>
-<span class="chip" onclick="setInput('A C E allegro')">A C E allegro</span>
-<span class="chip" onclick="setInput('violin trumpet 120 bpm')">violin trumpet 120bpm</span>
-<span class="chip" onclick="setInput('D F# A B presto')">D F# A B presto</span>
-<span class="chip" onclick="setInput('the flute section sounds flat and slow')">flute feedback</span>
+<p class="tagline">Real-time pitch, timing & harmony analysis for orchestral performance</p>
+</header>
+
+<div class="card">
+<div class="card-header"><span>🎹</span> Quick Input — click notes or examples</div>
+<div class="keyboard" id="keyboard"></div>
+<div class="examples" id="examples"></div>
+<div class="mode-tabs">
+<div class="mode-tab active" onclick="setMode('free')">Free Input</div>
+<div class="mode-tab" onclick="setMode('chord')">Chord Mode</div>
+<div class="mode-tab" onclick="setMode('scale')">Scale Finder</div>
+<div class="mode-tab" onclick="setMode('feedback')">Performance</div>
 </div>
-<div class="input-wrap">
-<textarea id="inp" placeholder="Enter musical notes (C D E F G A B), tempo (allegro, 120 bpm), instruments, or describe a performance..." rows="3"></textarea>
+<div class="input-group">
+<textarea id="inp" placeholder="Enter notes, tempo, instruments, or describe your performance..." rows="3"></textarea>
+<div class="char-count" id="charCount">0</div>
 </div>
 <div class="btn-row">
-<button class="btn-primary" onclick="analyze()">🎯 Analyze</button>
-<button class="btn-secondary" onclick="clearAll()">Clear</button>
+<button class="btn-analyze" id="analyzeBtn" onclick="analyze()">🎯 Analyze Performance</button>
+<button class="btn-clear" onclick="clearAll()">✕ Clear</button>
+<button class="btn-history" onclick="toggleHistory()">📋 History</button>
 </div>
-<div class="output-label">Conductor Feedback</div>
-<div class="output-box" id="out">🎵 Ready to analyze. Enter notes, tempo, or instruments above.</div>
-<div class="footer">Symphony Conductor AI — Real-time pitch & timing analysis</div>
-<svg class="wave" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,30 Q150,0 300,30 T600,30 T900,30 T1200,30 V60 H0 Z" fill="#7b68ee"/></svg>
+<div class="history-panel" id="historyPanel"></div>
 </div>
+
+<div class="card output-card" id="outputCard">
+<div class="output-label">
+<span>🎼 Conductor Feedback</span>
+<div class="status"><div class="status-dot" id="statusDot"></div><span id="statusText">Ready</span></div>
+</div>
+<div class="output-box" id="out">🎼 Welcome to Symphony Conductor AI!
+
+🎯 What you can do:
+• Click piano keys above to build note sequences
+• Enter tempo markings: allegro, 120 bpm, presto
+• Name instruments: violin, trumpet, flute, cello
+• Describe issues: sounds flat, too fast, brass loud
+• Analyze dynamics: ff, pp, crescendo
+• Explore scales: C major scale, A minor
+
+💡 Try clicking an example chip to get started!</div>
+</div>
+
+<div class="card" style="animation-delay:.2s">
+<div class="card-header"><span>⚡</span> What This Tool Analyzes</div>
+<div class="features">
+<div class="feat"><div class="feat-icon">🎼</div><div class="feat-text"><strong>Pitch Detection</strong>Note frequencies, intonation, cents analysis</div></div>
+<div class="feat"><div class="feat-icon">🏛️</div><div class="feat-text"><strong>Harmony</strong>Chords, key detection, scale matching</div></div>
+<div class="feat"><div class="feat-icon">⏱️</div><div class="feat-text"><strong>Timing</strong>Tempo, BPM, beat subdivision</div></div>
+<div class="feat"><div class="feat-icon">🎻</div><div class="feat-text"><strong>Instrumentation</strong>Section balance, ranges, blend</div></div>
+<div class="feat"><div class="feat-icon">🔊</div><div class="feat-text"><strong>Dynamics</strong>Volume levels, crescendo/diminuendo</div></div>
+<div class="feat"><div class="feat-icon">🎯</div><div class="feat-text"><strong>Conductor Tips</strong>Actionable rehearsal advice</div></div>
+</div>
+</div>
+
+<footer>Symphony Conductor AI &mdash; Real-time orchestral analysis &bull; Built with FastAPI</footer>
+</div>
+
 <script>
-(function(){var s=document.getElementById('stars');for(var i=0;i<80;i++){var d=document.createElement('div');d.className='star';d.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;width:'+(.5+Math.random()*2)+'px;height:'+(.5+Math.random()*2)+'px;--d:'+(1+Math.random()*3)+'s;animation-delay:'+Math.random()*3+'s';s.appendChild(d)}})();
-function setInput(v){document.getElementById('inp').value=v;document.getElementById('inp').focus()}
-function clearAll(){document.getElementById('inp').value='';document.getElementById('out').textContent='🎵 Ready to analyze. Enter notes, tempo, or instruments above.';document.getElementById('out').classList.remove('active')}
-async function analyze(){
-var inp=document.getElementById('inp'),out=document.getElementById('out'),data=inp.value;
-out.innerHTML='<span class="loading"></span> Analyzing performance...';out.classList.add('active');
-try{var r=await fetch('/solve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:data})});var j=await r.json();out.textContent=j.output}catch(e){out.textContent='⚠️ Connection error. Please try again.'}
-}
+var history=JSON.parse(localStorage.getItem('sc_hist')||'[]');
+var mode='free';
+var KEYS=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+var EXAMPLES=[
+{l:'C E G',d:'Major triad'},{l:'A C E allegro',d:'Minor + tempo'},{l:'C E G B',d:'Major 7th'},{l:'D F# A C#',d:'D major 7th'},
+{l:'violin trumpet flute cello',d:'Orchestration'},{l:'120 bpm ff crescendo',d:'Tempo + dynamics'},
+{l:'C major scale',d:'Scale reference'},{l:'sounds sharp and rushing',d:'Performance fix'},
+{l:'D F A presto pp',d:'Full analysis'},{l:'G B D F allegro trumpet',d:'Combined input'}
+];
+
+(function init(){
+var s=document.getElementById('stars');
+for(var i=0;i<100;i++){var d=document.createElement('div');d.className='star';d.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;width:'+(0.4+Math.random()*2)+'px;height:'+(0.4+Math.random()*2)+'px;--d:'+(1+Math.random()*4)+'s;animation-delay:'+Math.random()*4+'s';s.appendChild(d)}
+var nb=document.getElementById('notesBg');
+var symbols=['♪','♫','♬','♩','𝄞'];
+for(var i=0;i<15;i++){var n=document.createElement('div');n.className='note-particle';n.textContent=symbols[i%symbols.length];n.style.cssText='left:'+Math.random()*100+'%;top:'+(20+Math.random()*70)+'%;animation-delay:'+Math.random()*6+'s;animation-duration:'+(4+Math.random()*4)+'s';nb.appendChild(n)}
+var kb=document.getElementById('keyboard');
+KEYS.forEach(function(k){var b=document.createElement('div');b.className='key'+(k.includes('#')?' sharp':'');b.textContent=k;b.onclick=function(){addNote(k)};kb.appendChild(b)});
+var ex=document.getElementById('examples');
+EXAMPLES.forEach(function(e){var c=document.createElement('span');c.className='chip';c.textContent=e.d;c.title=e.l;c.onclick=function(){setInput(e.l)};ex.appendChild(c)});
+document.getElementById('inp').addEventListener('input',updateCount);
 document.getElementById('inp').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();analyze()}});
+updateCount();
+renderHistory();
+})();
+
+function addNote(n){var inp=document.getElementById('inp');var v=inp.value;inp.value=v+(v&&!v.endsWith(' ')?' ':'')+n;inp.focus();updateCount()}
+function setInput(v){document.getElementById('inp').value=v;document.getElementById('inp').focus();updateCount()}
+function clearAll(){document.getElementById('inp').value='';document.getElementById('out').textContent='🎼 Ready for analysis. Enter notes, tempo, or instruments above.';document.getElementById('outputCard').classList.remove('has-content');updateCount()}
+function updateCount(){var c=document.getElementById('inp').value.length;document.getElementById('charCount').textContent=c}
+function setMode(m){mode=m;document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('active')});event.target.classList.add('active');var inp=document.getElementById('inp');var placeholders={free:'Enter notes, tempo, instruments, or describe your performance...',chord:'Enter 3+ notes for chord analysis (e.g. C E G B)...',scale:'Enter a scale name (e.g. C major scale, A minor, D blues)...',feedback:'Describe what you hear (e.g. sounds flat, rushing, brass too loud)...'};inp.placeholder=placeholders[m]||placeholders.free;inp.focus()}
+function toggleHistory(){var p=document.getElementById('historyPanel');p.classList.toggle('open');renderHistory()}
+function renderHistory(){var p=document.getElementById('historyPanel');if(!history.length){p.innerHTML='<div class="history-empty">No analysis history yet</div>';return}p.innerHTML=history.slice(0,15).map(function(h,i){return'<div class="history-item" onclick="replayHistory('+i+')"><div>'+h.input.substring(0,60)+(h.input.length>60?'...':'')+'</div><div class="history-time">'+h.time+'</div></div>'}).join('')}
+function replayHistory(i){if(history[i]){document.getElementById('inp').value=history[i].input;document.getElementById('out').textContent=history[i].output;document.getElementById('outputCard').classList.add('has-content');updateCount()}}
+
+async function analyze(){
+var inp=document.getElementById('inp'),out=document.getElementById('out'),btn=document.getElementById('analyzeBtn'),dot=document.getElementById('statusDot'),stxt=document.getElementById('statusText');
+var data=inp.value;
+btn.disabled=true;
+dot.classList.add('loading');
+stxt.textContent='Analyzing...';
+out.innerHTML='<div class="loading-indicator"><div class="dot-wave"><span></span><span></span><span></span></div> Analyzing your performance...</div>';
+out.classList.remove('fresh');
+try{
+var r=await fetch('/solve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:data})});
+var j=await r.json();
+out.textContent=j.output;
+out.classList.add('fresh');
+document.getElementById('outputCard').classList.add('has-content');
+if(data.trim()){history.unshift({input:data,output:j.output,time:new Date().toLocaleTimeString()});if(history.length>20)history.pop();localStorage.setItem('sc_hist',JSON.stringify(history));renderHistory()}
+stxt.textContent='Complete';
+}catch(e){out.textContent='⚠️ Connection error — please try again.';stxt.textContent='Error'}
+btn.disabled=false;
+dot.classList.remove('loading');
+setTimeout(function(){stxt.textContent='Ready'},3000);
+}
 </script>
 </body>
 </html>
